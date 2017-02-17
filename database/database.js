@@ -109,8 +109,8 @@ Database.prototype.delete = function (collection, filter, callback) {
 /**
  * Удаляет объекты в collection просеивая через filter и выполняет callback-функцию
  *
- * @param {string} collection коллекция
- * @param {object} filter фильтр поиска
+ * @param {string} collection коллекция (название коллекции)
+ * @param {object} filter фильтр поиска (уникальный идентификатор по которому необхожимо найти нужного пользователся
  * @param {object} updateFilter параметры замены
  * @param {object} callback callback-функция, получающая результат на обработку
  */

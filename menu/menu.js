@@ -5,16 +5,21 @@
 var keyboards = require('./keyboards.js');
 var User = require('../user/user.js');
 User = new User();
+var bot2;
 /**
  * Создаёт экземпляр класса Menu
  *
  * @this {Menu}
  * @constructor
  */
+var Schedule = require('../schedule/schedule.js');
 function Menu(bot) {
   this.bot = bot;
+  this.Schedule = new Schedule();
+  bot2 = bot;
+
 }
-this.userOptions = {};
+
 
 //TODO: сделать подгрузку из БД
 /**
@@ -22,9 +27,6 @@ this.userOptions = {};
  * @type {object}
  */
 
-Menu.prototype.checkUser = function () {
-
-};
 
 
 Menu.prototype.showStartMenu = function (msg) {
@@ -38,12 +40,23 @@ Menu.prototype.showStartMenu = function (msg) {
 
 
 
+
+Menu.prototype.sendSchedule = sendSchedule;
+  function sendSchedule(schedule, chatID) {
+  var options = {
+    parse_mode: "HTML"
+  };
+  for(var i = 0, len = schedule.length; i < len; i++){
+    bot2.sendMessage(chatID, schedule[i], options);
+  }
+}
+
 /**
  * Показать главное меню
  *
  * @param {string} msg
  */
-Menu.prototype.showHelloMenu = function(msg) {
+Menu.prototype.showHelloMenu = function (msg) {
   this.bot.sendMessage(msg.chat.id, 'Выберите, что вы хотите сделать', keyboards.keyboardHelloMenu);
 };
 
@@ -54,7 +67,9 @@ Menu.prototype.showHelloMenu = function(msg) {
  * @param {object} callbackQuery
  */
 Menu.prototype.callbackQueryHandler = function(callbackQuery) {
-
+  var userOptions = {
+    userID: callbackQuery.from.id
+  };
   /**
    * Условия главного меню и переходы в подменю
    */
@@ -68,11 +83,43 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
   }
 
   if (callbackQuery.data == 'groupSchedule'){
-    this.bot.answerCallbackQuery(callbackQuery.id,'🛠В процессе разработки🛠',true);
+    this.bot.editMessageText('Выбери на какой день тебе показать расписание', {
+      'chat_id': callbackQuery.from.id,
+      'message_id': callbackQuery.message.message_id,
+      'reply_markup': keyboards.keyboardDayOfWeek.reply_markup
+    });
   }
 
   if (callbackQuery.data == 'teacherSchedule'){
     this.bot.answerCallbackQuery(callbackQuery.id,'🛠В процессе разработки🛠',true);
+  }
+
+  /**
+   * Подменю вывода расписания своей группы
+   */
+
+
+
+  if ((callbackQuery.data >= 1 && callbackQuery.data <= 6)||(callbackQuery.data.split('_')[0] == 'allDay')) {
+    if (callbackQuery.data.split('_')[0] == 'allDay') {
+      this.DAY = callbackQuery.data.split('_')[1];
+    }else {
+      this.DAY = callbackQuery.data;
+    }
+      this.bot.editMessageText('Рапсисание четной или нечетной недели тебе показать?',{
+        'chat_id': callbackQuery.from.id,
+        'message_id': callbackQuery.message.message_id,
+        'reply_markup': keyboards.keyboardOddOrEven.reply_markup
+      });
+  }
+
+
+  if ((callbackQuery.data.split('_')[0] == 'odd')||(callbackQuery.data.split('_')[0] == 'even')){
+    WEEK = callbackQuery.data;
+    this.Schedule.Group('P3217').getSchedule(this.DAY,callbackQuery.data.split('_')[1],function (schedule) {
+      sendSchedule(schedule, callbackQuery.from.id);
+    }, true);
+
   }
 
   /**
@@ -106,6 +153,7 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
 
   }
 
+
   if (callbackQuery.data == 'notificationDay'){
     //TODO: user.getOptions(callback.from.id, function(){})
 
@@ -113,7 +161,6 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
 
     this.bot.answerCallbackQuery(callbackQuery.id,'✔Уведомления о расписании на день '
       + ((userOptions.notificationDay==true)?'включены':'выключены'),false);
-     //TODO: изменение каждой клавиши на другой смайл при изменение.
 
     if (userOptions.notificationDay == true) {
       this.bot.editMessageText('Хотите выполнить настройку уведомлений сейчас?' +

@@ -53,10 +53,5 @@ function getOptions(userID, callback){
 }
 
 
-
-
-
-
-
 module.exports = User;
 ///module.exports.userOptions = this.userOptions;

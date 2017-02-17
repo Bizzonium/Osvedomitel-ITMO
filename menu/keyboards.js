@@ -8,6 +8,27 @@ module.exports.keyboardHelloMenu = {
   })
 };
 
+module.exports.keyboardDayOfWeek = {
+  reply_markup: JSON.stringify({
+    inline_keyboard: [
+      [{ text: 'Понедельник', callback_data: '1' },{text: 'Вторник', callback_data: '2'}],
+      [{ text: 'Среда', callback_data: '3' },{text: 'Четверг', callback_data: '4'}],
+      [{ text: 'Пятница', callback_data: '5' },{text: 'Суббота', callback_data: '6'}],
+      [{text: 'На всю неделю', callback_data: 'allDay_0'}]
+    ]
+  })
+};
+
+
+module.exports.keyboardOddOrEven = {
+  reply_markup: JSON.stringify({
+    inline_keyboard: [
+      [{ text: 'Нечетная', callback_data: 'odd_1' },{text: 'Четная', callback_data: 'even_2'}]
+    ]
+  })
+};
+
+
 module.exports.keyboardSettings = {
   reply_markup: JSON.stringify({
     inline_keyboard: [
