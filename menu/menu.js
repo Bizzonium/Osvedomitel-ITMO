@@ -60,6 +60,7 @@ Menu.prototype.showHelloMenu = function (msg) {
   this.bot.sendMessage(msg.chat.id, 'Выберите, что вы хотите сделать', keyboards.keyboardHelloMenu);
 };
 
+
 //TODO: заменить if на switch, наверное
 /**
  * Обработчик событий callbackQuery
@@ -67,9 +68,25 @@ Menu.prototype.showHelloMenu = function (msg) {
  * @param {object} callbackQuery
  */
 Menu.prototype.callbackQueryHandler = function(callbackQuery) {
-  var userOptions = {
+  this.userOption = {
     userID: callbackQuery.from.id
   };
+
+  this.userOption = function() {
+    // вызов без параметра, значит режим геттера, возвращаем свойство
+    if (!arguments.length) return waterAmount;
+
+    // иначе режим сеттера
+    if (amount < 0) {
+      throw new Error("Значение должно быть положительным");
+    }
+    if (amount > capacity) {
+      throw new Error("Нельзя залить воды больше, чем " + capacity);
+    }
+
+    waterAmount = amount;
+  };
+
   /**
    * Условия главного меню и переходы в подменю
    */
@@ -80,13 +97,20 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
       'message_id': callbackQuery.message.message_id,
       'reply_markup': keyboards.keyboardSettings.reply_markup
     });
+    User.getOptions(callbackQuery.from.id, function (userOptions) {
+      userOption = userOptions;
+    });
   }
 
   if (callbackQuery.data == 'groupSchedule'){
+
     this.bot.editMessageText('Выбери на какой день тебе показать расписание', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id,
       'reply_markup': keyboards.keyboardDayOfWeek.reply_markup
+    });
+    User.getOptions(callbackQuery.from.id, function (userOptions) {
+      userOption = userOptions;
     });
   }
 
@@ -116,7 +140,7 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
 
   if ((callbackQuery.data.split('_')[0] == 'odd')||(callbackQuery.data.split('_')[0] == 'even')){
     WEEK = callbackQuery.data;
-    this.Schedule.Group('P3217').getSchedule(this.DAY,callbackQuery.data.split('_')[1],function (schedule) {
+    this.Schedule.Group(userOption.group).getSchedule(this.DAY,callbackQuery.data.split('_')[1],function (schedule) {
       sendSchedule(schedule, callbackQuery.from.id);
     }, true);
 
@@ -142,13 +166,10 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
         ]
       })
     };
-
     this.bot.editMessageText('Выбери что ты хочешь сделать', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id
     },options);
-
-
 //TODO: доеделать функционал для изменения группы пользователя
 
   }
@@ -157,12 +178,13 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
   if (callbackQuery.data == 'notificationDay'){
     //TODO: user.getOptions(callback.from.id, function(){})
 
-    userOptions.notificationDay = !userOptions.notificationDay; //TODO: отправлять изменения сразу на сервер
+    userOption.notificationDay = !userOption.notificationDay; //TODO: отправлять изменения сразу на сервер
+    // User.updateInfo(userOption.userID, userOption);
 
     this.bot.answerCallbackQuery(callbackQuery.id,'✔Уведомления о расписании на день '
-      + ((userOptions.notificationDay==true)?'включены':'выключены'),false);
+      + ((userOption.notificationDay==true)?'включены':'выключены'),false);
 
-    if (userOptions.notificationDay == true) {
+    if (userOption.notificationDay == true) {
       this.bot.editMessageText('Хотите выполнить настройку уведомлений сейчас?' +
         '(Если нажмете нет, то они автоматически отключатся)',
         {
@@ -174,10 +196,19 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
   }
 
   if (callbackQuery.data == 'notificationLesson') {
-    userOptions.notificationNextLesson = !userOptions.notificationNextLesson;
+    userOption.notificationNextLesson = !userOption.notificationNextLesson;
+    console.log(userOption);
+    var updateFilter = {
+      $set: {
+        notificationNextLesson: userOption.notificationNextLesson
+      }
+    };
+
+    User.updateInfo(userOption.userID, updateFilter);
+
     //TODO: изменение каждой клавиши на другой смайл при изменение.
     this.bot.answerCallbackQuery(callbackQuery.id, '✔Уведомления о следующей паре ' +
-      ((userOptions.notificationNextLesson == true) ? 'включены' : 'выключены'), false);
+      ((userOption.notificationNextLesson == true) ? 'включены' : 'выключены'), false);
   }
 
   /**

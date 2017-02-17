@@ -1,9 +1,9 @@
 var bot = require('./telegrambot/telegramBot.js');
 
 /**
- * Модуль для работы с расписанием
- * @type {object}
- */
+* Модуль для работы с расписанием
+* @type {object}
+*/
 var user = require('./user/user.js');
 var user = new user();
 var Schedule = require('./schedule/schedule.js');

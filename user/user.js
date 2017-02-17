@@ -30,10 +30,10 @@ function addUser(userID) {
 User.prototype.getOptions = getOptions;
 function getOptions(userID, callback){
   var filter = {
-   "userID": userID
+   userID: userID
  };
   Database.find("Users",filter, function(err, results) {
-    console.log(results);
+    //console.log(results);
     if (results.length == 0){
       addUser(userID);
       getOptions(userID, function (userOptions) {
@@ -49,6 +49,15 @@ function getOptions(userID, callback){
       };
       callback(userOptions);
     }
+  });
+}
+
+User.prototype.updateInfo = updateInfo;
+function updateInfo(userID,userOptions) {
+  var filter = {
+    userID: userID
+  };
+  Database.update("Users", filter, userOptions,function (err, result) {
   });
 }
 

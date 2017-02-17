@@ -120,7 +120,7 @@ Database.prototype.update = function (collection, filter, updateFilter, callback
       return console.log(err);
     }
 
-    db.collection(collection).updateMany(filter, updateFilter, function(err, result){
+    db.collection(collection).updateOne(filter, updateFilter, function(err, result){
       if (err) {
         return console.log(err);
       }
