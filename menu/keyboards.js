@@ -23,7 +23,8 @@ module.exports.keyboardDayOfWeek = {
 module.exports.keyboardOddOrEven = {
   reply_markup: JSON.stringify({
     inline_keyboard: [
-      [{ text: 'Нечетная', callback_data: 'odd_1' },{text: 'Четная', callback_data: 'even_2'}]
+      [{ text: 'Нечетная', callback_data: 'odd_1' },{text: 'Четная', callback_data: 'even_2'}],
+      [{ text: '⬅Вернуться к выбору дня', callback_data: 'backDay' }]
     ]
   })
 };
@@ -35,7 +36,7 @@ module.exports.keyboardSettings = {
       [{ text: '🎓Номер вашей группы', callback_data: 'userGroup' }],
       [{ text: '🔔Уведомление о следующей паре', callback_data: 'notificationLesson' }],
       [{ text: '🔔Уведомления о расписание на день', callback_data: 'notificationDay' }],
-      [{ text: '⬅️Вернуться назад', callback_data: 'settingsBack' }]
+      [{ text: '⬅️Вернуться в главное меню', callback_data: 'settingsBack' }]
     ]
   })
 };

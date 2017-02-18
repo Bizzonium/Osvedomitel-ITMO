@@ -55,6 +55,7 @@ Menu.prototype.sendSchedule = sendSchedule;
   for(var i = 0, len = schedule.length; i < len; i++){
     _bot.sendMessage(chatID, schedule[i], options);
   }
+  _bot.sendMessage(chatID,'Выберите, что вы хотите сделать', keyboards.keyboardHelloMenu);
 }
 
 /**
@@ -73,7 +74,7 @@ Menu.prototype.showHelloMenu = function (msg) {
  *
  * @param {object} callbackQuery
  */
-Menu.prototype.callbackQueryHandler = function(callbackQuery,userOption) {
+Menu.prototype.callbackQueryHandler = function(callbackQuery) {
   //var userOption = new UserOptions(callbackQuery.from.id).userOption;
 
   /**
@@ -87,47 +88,74 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery,userOption) {
     });
   }
 
-  if (callbackQuery.data == 'groupSchedule'){
-    _bot.editMessageText('Выбери на какой день тебе показать расписание', {
+  if (callbackQuery.data == 'groupSchedule') {
+    User.getOptions(callbackQuery.from.id,function (userOption) {
+
+      if (userOption.group == null) {
+
+        _bot.answerCallbackQuery(callbackQuery.id, 'Ой, а у тебя не установлена группа☹️,' +
+          'я перенаправил тебя в настройки, можешь это сделать сейчас😉', true);
+
+        _bot.editMessageText('Настройки профиля', {
+          'chat_id': callbackQuery.from.id,
+          'message_id': callbackQuery.message.message_id,
+          'reply_markup': keyboards.keyboardSettings.reply_markup
+        });
+      } else {
+
+        _bot.editMessageText('Выбери на какой день тебе показать расписание', {
+          'chat_id': callbackQuery.from.id,
+          'message_id': callbackQuery.message.message_id,
+          'reply_markup': keyboards.keyboardDayOfWeek.reply_markup
+        });
+      }
+    });
+  }
+
+  if (callbackQuery.data == 'teacherSchedule') {
+    _bot.answerCallbackQuery(callbackQuery.id, '🛠В процессе разработки🛠', true);
+  }
+
+  /**
+   * Подменю вывода расписания своей группы
+   */
+  if ((callbackQuery.data >= 1 && callbackQuery.data <= 6) || (callbackQuery.data.split('_')[0] == 'allDay')) {
+    if (callbackQuery.data.split('_')[0] == 'allDay') {
+      this.DAY = callbackQuery.data.split('_')[1];
+    } else {
+      this.DAY = callbackQuery.data;
+    }
+    _bot.editMessageText('Рапсисание четной или нечетной недели тебе показать?', {
+      'chat_id': callbackQuery.from.id,
+      'message_id': callbackQuery.message.message_id,
+      'reply_markup': keyboards.keyboardOddOrEven.reply_markup
+    });
+  }
+
+
+  if ((callbackQuery.data.split('_')[0] == 'odd') || (callbackQuery.data.split('_')[0] == 'even')) {
+    _DAY = this.DAY;
+    _Schedule = this.Schedule;
+    User.getOptions(callbackQuery.from.id,function (userOption) {
+      WEEK = callbackQuery.data;
+        _Schedule.Group(userOption.group).getSchedule(_DAY, callbackQuery.data.split('_')[1], function (schedule) {
+          sendSchedule(schedule, callbackQuery.from.id);
+        }, true);
+    });
+  }
+
+  if (callbackQuery.data == 'backDay'){
+    _bot.editMessageText('Выберите что вы хотите сделать', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id,
       'reply_markup': keyboards.keyboardDayOfWeek.reply_markup
     });
   }
 
-  if (callbackQuery.data == 'teacherSchedule'){
-    _bot.answerCallbackQuery(callbackQuery.id,'🛠В процессе разработки🛠',true);
-  }
-
-  /**
-   * Подменю вывода расписания своей группы
-   */
-  if ((callbackQuery.data >= 1 && callbackQuery.data <= 6)||(callbackQuery.data.split('_')[0] == 'allDay')) {
-    if (callbackQuery.data.split('_')[0] == 'allDay') {
-      this.DAY = callbackQuery.data.split('_')[1];
-    }else {
-      this.DAY = callbackQuery.data;
-    }
-      _bot.editMessageText('Рапсисание четной или нечетной недели тебе показать?',{
-        'chat_id': callbackQuery.from.id,
-        'message_id': callbackQuery.message.message_id,
-        'reply_markup': keyboards.keyboardOddOrEven.reply_markup
-      });
-  }
-
-
-  if ((callbackQuery.data.split('_')[0] == 'odd')||(callbackQuery.data.split('_')[0] == 'even')){
-    WEEK = callbackQuery.data;
-    this.Schedule.Group(userOption.group).getSchedule(this.DAY,callbackQuery.data.split('_')[1],function (schedule) {
-      sendSchedule(schedule, callbackQuery.from.id);
-    }, true);
-
-  }
-
   /**
    * Условия подменю "Настройки профиля" и его подменю
    */
-  if (callbackQuery.data == 'settingsBack'){
+  if (callbackQuery.data == 'settingsBack') {
     _bot.editMessageText('Выберите что вы хотите сделать', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id,
@@ -136,41 +164,38 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery,userOption) {
   }
 
 
-  if (callbackQuery.data == 'userGroup'){
-    var options = {
-      reply_markup: JSON.stringify({
-        keyboard: [
-          [{ text: 'Обновить мою группу'},{text: 'Отмена'}]
-        ]
-      })
-    };
-    _bot.editMessageText('Выбери что ты хочешь сделать', {
+  if (callbackQuery.data == 'userGroup') {
+    _bot.editMessageText('Напиши свою групу. Например, P3217. Я сообщу тебе, когда ты ' +
+      'правильно введешь группу.', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id
-    },options);
-//TODO: доеделать функционал для изменения группы пользователя
+    });
+    waitForAnswer(callbackQuery);
+}
 
-  }
 
+  if (callbackQuery.data == 'notificationDay') {
+    User.getOptions(callbackQuery.from.id, function (userOption) {
+      userOption.notificationDay = !userOption.notificationDay;
+      var updateFilter = {
+        $set: {
+          notificationDay: userOption.notificationDay
+        }
+      };
+      User.updateInfo(callbackQuery.from.id, updateFilter);
+      _bot.answerCallbackQuery(callbackQuery.id, '✔Уведомления о расписании на день '
+        + ((userOption.notificationDay == true) ? 'включены' : 'выключены'), false);
 
-  if (callbackQuery.data == 'notificationDay'){
-    //TODO: user.getOptions(callback.from.id, function(){})
-
-    userOption.notificationDay = !userOption.notificationDay; //TODO: отправлять изменения сразу на сервер
-    // User.updateInfo(userOption.userID, userOption);
-
-    _bot.answerCallbackQuery(callbackQuery.id,'✔Уведомления о расписании на день '
-      + ((userOption.notificationDay==true)?'включены':'выключены'),false);
-
-    if (userOption.notificationDay == true) {
-      _bot.editMessageText('Хотите выполнить настройку уведомлений сейчас?' +
-        '(Если нажмете нет, то они автоматически отключатся)',
-        {
-        'chat_id': callbackQuery.from.id,
-        'message_id': callbackQuery.message.message_id,
-        'reply_markup': keyboards.keyboardYesOrNo.reply_markup
-      });
-    }
+      if (userOption.notificationDay == true) {
+        _bot.editMessageText('Хотите выполнить настройку уведомлений сейчас?' +
+          '(Если нажмете нет, то они автоматически отключатся)',
+          {
+            'chat_id': callbackQuery.from.id,
+            'message_id': callbackQuery.message.message_id,
+            'reply_markup': keyboards.keyboardYesOrNo.reply_markup
+          });
+      }
+    });
   }
 
   if (callbackQuery.data == 'notificationLesson') {
@@ -181,7 +206,6 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery,userOption) {
           notificationNextLesson: userOption.notificationNextLesson
         }
       };
-
       User.updateInfo(callbackQuery.from.id, updateFilter);
       //TODO: изменение каждой клавиши на другой смайл при изменение.
       _bot.answerCallbackQuery(callbackQuery.id, '✔Уведомления о следующей паре ' +
@@ -193,19 +217,24 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery,userOption) {
   /**
    * Подменю выбора ДА или НЕТ
    */
-  if (callbackQuery.data == 'yes'){
+  if (callbackQuery.data == 'yes') {
     _bot.editMessageText('Выберите удобное для Вас время, когда будет приходить' +
       ' расписание на следующий день. При нажатии на кнопку "Отмена", уведомления о' +
       ' расписании на следующий день будут выключены.',
       {
-      'chat_id': callbackQuery.from.id,
-      'message_id': callbackQuery.message.message_id,
-      'reply_markup': keyboards.keyboardNotificationTime.reply_markup
-    });
+        'chat_id': callbackQuery.from.id,
+        'message_id': callbackQuery.message.message_id,
+        'reply_markup': keyboards.keyboardNotificationTime.reply_markup
+      });
   }
 
-  if (callbackQuery.data == 'no'){
-    userOption.notificationDay = false;
+  if (callbackQuery.data == 'no') {
+    var updateFilter = {
+      $set: {
+        notificationDay: false
+      }
+    };
+    User.updateInfo(callbackQuery.from.id, updateFilter);
     _bot.editMessageText('Настройки профиля', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id,
@@ -216,23 +245,23 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery,userOption) {
   /**
    * Подменю настройки уведомлений о расписании на следующий день
    */
-  if (callbackQuery.data == 'morning'){
+  if (callbackQuery.data == 'morning') {
     _bot.editMessageText('Выберите время', {
-     'chat_id': callbackQuery.from.id,
-     'message_id': callbackQuery.message.message_id,
-     'reply_markup': keyboards.keyboardChooseTimeMorning.reply_markup
+      'chat_id': callbackQuery.from.id,
+      'message_id': callbackQuery.message.message_id,
+      'reply_markup': keyboards.keyboardChooseTimeMorning.reply_markup
     });
   }
 
-  if (callbackQuery.data == 'lunch'){
-   _bot.editMessageText('Выберите время', {
-     'chat_id': callbackQuery.from.id,
-     'message_id': callbackQuery.message.message_id,
-     'reply_markup': keyboards.keyboardChooseTimeLunch.reply_markup
-   });
+  if (callbackQuery.data == 'lunch') {
+    _bot.editMessageText('Выберите время', {
+      'chat_id': callbackQuery.from.id,
+      'message_id': callbackQuery.message.message_id,
+      'reply_markup': keyboards.keyboardChooseTimeLunch.reply_markup
+    });
   }
 
-  if (callbackQuery.data == 'evening'){
+  if (callbackQuery.data == 'evening') {
 
     _bot.editMessageText('Выберите время', {
       'chat_id': callbackQuery.from.id,
@@ -241,31 +270,68 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery,userOption) {
     });
   }
 
-  if (callbackQuery.data == 'backChooseTime'){
+  if (callbackQuery.data == 'backChooseTime') {
     _bot.editMessageText('Выберите удобное для Вас время, когда будет приходить ' +
       'расписание на следующий день. При нажатии на кнопку "Отмена", уведомления о ' +
       'расписании на следующий день будут выключены.',
       {
-      'chat_id': callbackQuery.from.id,
-      'message_id': callbackQuery.message.message_id,
-      'reply_markup': keyboards.keyboardNotificationTime.reply_markup
-    });
+        'chat_id': callbackQuery.from.id,
+        'message_id': callbackQuery.message.message_id,
+        'reply_markup': keyboards.keyboardNotificationTime.reply_markup
+      });
   }
 
   /*
-  Обработка выбранного времени для уведомлений пользователем
+   Обработка выбранного времени для уведомлений пользователем
    */
-  if (callbackQuery.data.split('_')[0] == 'Time' ){
-    userOption.notificationTime = callbackQuery.data.split('_')[1];
-    _bot.answerCallbackQuery(callbackQuery.id, 'Расписание будет Вам приходить в '
-      +userOption.notificationTime, false);
+  if (callbackQuery.data.split('_')[0] == 'Time') {
+    User.getOptions(callbackQuery.from.id, function (userOption) {
 
-    _bot.editMessageText('Настройки профиля', {
-      'chat_id': callbackQuery.from.id,
-      'message_id': callbackQuery.message.message_id,
-      'reply_markup': keyboards.keyboardSettings.reply_markup
+      userOption.notificationTime = callbackQuery.data.split('_')[1];
+      var updateFilter = {
+        $set: {
+          notificationTime: userOption.notificationTime
+        }
+      };
+      User.updateInfo(callbackQuery.from.id, updateFilter);
+
+      _bot.answerCallbackQuery(callbackQuery.id, 'Расписание будет Вам приходить в '
+        + userOption.notificationTime, false);
+
+      _bot.editMessageText('Настройки профиля', {
+        'chat_id': callbackQuery.from.id,
+        'message_id': callbackQuery.message.message_id,
+        'reply_markup': keyboards.keyboardSettings.reply_markup
+      });
     });
   }
 };
 
 module.exports = Menu;
+
+function waitForAnswer(callbackQuery) {
+  _bot.onText(/[A-Z][0-9]{4}/,function (msg, match) {
+    if(msg.from.id === callbackQuery.from.id){
+      updateFilter = {
+        $set: {
+          group: match[0]
+        }
+      };
+      console.log('ДО\n');
+      console.log(callbackQuery);
+       _bot.answerCallbackQuery(callbackQuery.id,'Отлично я запомнил твою группу: '+match[0],false);
+
+       console.log('ПОСЛЕ\n');
+      console.log(callbackQuery);
+
+       User.updateInfo(callbackQuery.from.id, updateFilter);
+
+      _bot.sendMessage(callbackQuery.from.id,'Настройки профиля', {
+        'chat_id': callbackQuery.from.id,
+        'message_id': callbackQuery.message.message_id,
+        'reply_markup': keyboards.keyboardSettings.reply_markup
+      });
+    }
+
+  });
+}
