@@ -3,22 +3,34 @@
  * @type {object}
  */
 var keyboards = require('./keyboards.js');
+
+/**
+ *
+ * @type {User}
+ */
 var User = require('../user/user.js');
 User = new User();
-var bot2;
+
+
+var _bot;
 /**
  * Создаёт экземпляр класса Menu
  *
  * @this {Menu}
  * @constructor
  */
-var Schedule = require('../schedule/schedule.js');
 function Menu(bot) {
-  this.bot = bot;
+  _bot = bot;
   this.Schedule = new Schedule();
-  bot2 = bot;
-
 }
+
+/**
+ *
+ * @type {Schedule}
+ */
+var Schedule = require('../schedule/schedule.js');
+
+//var UserOptions = require('../user/userOptions.js');
 
 
 //TODO: сделать подгрузку из БД
@@ -30,16 +42,10 @@ function Menu(bot) {
 
 
 Menu.prototype.showStartMenu = function (msg) {
-  this.bot.sendMessage(msg.from.id,'Преветствую тебя, '+msg.chat.first_name+'!'+
+  _bot.sendMessage(msg.from.id,'Преветствую тебя, '+msg.chat.first_name+'!'+
   ' Я бот, который упростит твою жизнь с расписанием в самом неклассическом университете' +
     'по следующим командам я могу тебе помочь: *тута команды типа будут*');
-
-  User.getOptions(msg.from.id, function (userOptions) {
-  });
 };
-
-
-
 
 Menu.prototype.sendSchedule = sendSchedule;
   function sendSchedule(schedule, chatID) {
@@ -47,7 +53,7 @@ Menu.prototype.sendSchedule = sendSchedule;
     parse_mode: "HTML"
   };
   for(var i = 0, len = schedule.length; i < len; i++){
-    bot2.sendMessage(chatID, schedule[i], options);
+    _bot.sendMessage(chatID, schedule[i], options);
   }
 }
 
@@ -57,7 +63,7 @@ Menu.prototype.sendSchedule = sendSchedule;
  * @param {string} msg
  */
 Menu.prototype.showHelloMenu = function (msg) {
-  this.bot.sendMessage(msg.chat.id, 'Выберите, что вы хотите сделать', keyboards.keyboardHelloMenu);
+  _bot.sendMessage(msg.chat.id, 'Выберите, что вы хотите сделать', keyboards.keyboardHelloMenu);
 };
 
 
@@ -67,70 +73,42 @@ Menu.prototype.showHelloMenu = function (msg) {
  *
  * @param {object} callbackQuery
  */
-Menu.prototype.callbackQueryHandler = function(callbackQuery) {
-  this.userOption = {
-    userID: callbackQuery.from.id
-  };
-
-  this.userOption = function() {
-    // вызов без параметра, значит режим геттера, возвращаем свойство
-    if (!arguments.length) return waterAmount;
-
-    // иначе режим сеттера
-    if (amount < 0) {
-      throw new Error("Значение должно быть положительным");
-    }
-    if (amount > capacity) {
-      throw new Error("Нельзя залить воды больше, чем " + capacity);
-    }
-
-    waterAmount = amount;
-  };
+Menu.prototype.callbackQueryHandler = function(callbackQuery,userOption) {
+  //var userOption = new UserOptions(callbackQuery.from.id).userOption;
 
   /**
    * Условия главного меню и переходы в подменю
    */
   if (callbackQuery.data == 'settings') {
-    //console.log(callbackQuery);
-    this.bot.editMessageText('Настройки профиля', {
+    _bot.editMessageText('Настройки профиля', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id,
       'reply_markup': keyboards.keyboardSettings.reply_markup
     });
-    User.getOptions(callbackQuery.from.id, function (userOptions) {
-      userOption = userOptions;
-    });
   }
 
   if (callbackQuery.data == 'groupSchedule'){
-
-    this.bot.editMessageText('Выбери на какой день тебе показать расписание', {
+    _bot.editMessageText('Выбери на какой день тебе показать расписание', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id,
       'reply_markup': keyboards.keyboardDayOfWeek.reply_markup
     });
-    User.getOptions(callbackQuery.from.id, function (userOptions) {
-      userOption = userOptions;
-    });
   }
 
   if (callbackQuery.data == 'teacherSchedule'){
-    this.bot.answerCallbackQuery(callbackQuery.id,'🛠В процессе разработки🛠',true);
+    _bot.answerCallbackQuery(callbackQuery.id,'🛠В процессе разработки🛠',true);
   }
 
   /**
    * Подменю вывода расписания своей группы
    */
-
-
-
   if ((callbackQuery.data >= 1 && callbackQuery.data <= 6)||(callbackQuery.data.split('_')[0] == 'allDay')) {
     if (callbackQuery.data.split('_')[0] == 'allDay') {
       this.DAY = callbackQuery.data.split('_')[1];
     }else {
       this.DAY = callbackQuery.data;
     }
-      this.bot.editMessageText('Рапсисание четной или нечетной недели тебе показать?',{
+      _bot.editMessageText('Рапсисание четной или нечетной недели тебе показать?',{
         'chat_id': callbackQuery.from.id,
         'message_id': callbackQuery.message.message_id,
         'reply_markup': keyboards.keyboardOddOrEven.reply_markup
@@ -150,7 +128,7 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
    * Условия подменю "Настройки профиля" и его подменю
    */
   if (callbackQuery.data == 'settingsBack'){
-    this.bot.editMessageText('Выберите что вы хотите сделать', {
+    _bot.editMessageText('Выберите что вы хотите сделать', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id,
       'reply_markup': keyboards.keyboardHelloMenu.reply_markup
@@ -166,7 +144,7 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
         ]
       })
     };
-    this.bot.editMessageText('Выбери что ты хочешь сделать', {
+    _bot.editMessageText('Выбери что ты хочешь сделать', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id
     },options);
@@ -181,11 +159,11 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
     userOption.notificationDay = !userOption.notificationDay; //TODO: отправлять изменения сразу на сервер
     // User.updateInfo(userOption.userID, userOption);
 
-    this.bot.answerCallbackQuery(callbackQuery.id,'✔Уведомления о расписании на день '
+    _bot.answerCallbackQuery(callbackQuery.id,'✔Уведомления о расписании на день '
       + ((userOption.notificationDay==true)?'включены':'выключены'),false);
 
     if (userOption.notificationDay == true) {
-      this.bot.editMessageText('Хотите выполнить настройку уведомлений сейчас?' +
+      _bot.editMessageText('Хотите выполнить настройку уведомлений сейчас?' +
         '(Если нажмете нет, то они автоматически отключатся)',
         {
         'chat_id': callbackQuery.from.id,
@@ -196,26 +174,27 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
   }
 
   if (callbackQuery.data == 'notificationLesson') {
-    userOption.notificationNextLesson = !userOption.notificationNextLesson;
-    console.log(userOption);
-    var updateFilter = {
-      $set: {
-        notificationNextLesson: userOption.notificationNextLesson
-      }
-    };
+    User.getOptions(callbackQuery.from.id, function (userOption) {
+      userOption.notificationNextLesson = !userOption.notificationNextLesson;
+      var updateFilter = {
+        $set: {
+          notificationNextLesson: userOption.notificationNextLesson
+        }
+      };
 
-    User.updateInfo(userOption.userID, updateFilter);
-
-    //TODO: изменение каждой клавиши на другой смайл при изменение.
-    this.bot.answerCallbackQuery(callbackQuery.id, '✔Уведомления о следующей паре ' +
-      ((userOption.notificationNextLesson == true) ? 'включены' : 'выключены'), false);
+      User.updateInfo(callbackQuery.from.id, updateFilter);
+      //TODO: изменение каждой клавиши на другой смайл при изменение.
+      _bot.answerCallbackQuery(callbackQuery.id, '✔Уведомления о следующей паре ' +
+        ((userOption.notificationNextLesson == true) ? 'включены' : 'выключены'), false);
+    });
+    return;
   }
 
   /**
    * Подменю выбора ДА или НЕТ
    */
   if (callbackQuery.data == 'yes'){
-    this.bot.editMessageText('Выберите удобное для Вас время, когда будет приходить' +
+    _bot.editMessageText('Выберите удобное для Вас время, когда будет приходить' +
       ' расписание на следующий день. При нажатии на кнопку "Отмена", уведомления о' +
       ' расписании на следующий день будут выключены.',
       {
@@ -226,8 +205,8 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
   }
 
   if (callbackQuery.data == 'no'){
-    userOptions.notificationDay = false;
-    this.bot.editMessageText('Настройки профиля', {
+    userOption.notificationDay = false;
+    _bot.editMessageText('Настройки профиля', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id,
       'reply_markup': keyboards.keyboardSettings.reply_markup
@@ -238,7 +217,7 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
    * Подменю настройки уведомлений о расписании на следующий день
    */
   if (callbackQuery.data == 'morning'){
-    this.bot.editMessageText('Выберите время', {
+    _bot.editMessageText('Выберите время', {
      'chat_id': callbackQuery.from.id,
      'message_id': callbackQuery.message.message_id,
      'reply_markup': keyboards.keyboardChooseTimeMorning.reply_markup
@@ -246,7 +225,7 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
   }
 
   if (callbackQuery.data == 'lunch'){
-   this.bot.editMessageText('Выберите время', {
+   _bot.editMessageText('Выберите время', {
      'chat_id': callbackQuery.from.id,
      'message_id': callbackQuery.message.message_id,
      'reply_markup': keyboards.keyboardChooseTimeLunch.reply_markup
@@ -255,7 +234,7 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
 
   if (callbackQuery.data == 'evening'){
 
-    this.bot.editMessageText('Выберите время', {
+    _bot.editMessageText('Выберите время', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id,
       'reply_markup': keyboards.keyboardChooseTimeEvening.reply_markup
@@ -263,7 +242,7 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
   }
 
   if (callbackQuery.data == 'backChooseTime'){
-    this.bot.editMessageText('Выберите удобное для Вас время, когда будет приходить ' +
+    _bot.editMessageText('Выберите удобное для Вас время, когда будет приходить ' +
       'расписание на следующий день. При нажатии на кнопку "Отмена", уведомления о ' +
       'расписании на следующий день будут выключены.',
       {
@@ -277,11 +256,11 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
   Обработка выбранного времени для уведомлений пользователем
    */
   if (callbackQuery.data.split('_')[0] == 'Time' ){
-    userOptions.notificationTime = callbackQuery.data.split('_')[1];
-    this.bot.answerCallbackQuery(callbackQuery.id, 'Расписание будет Вам приходить в '
-      +userOptions.notificationTime, false);
+    userOption.notificationTime = callbackQuery.data.split('_')[1];
+    _bot.answerCallbackQuery(callbackQuery.id, 'Расписание будет Вам приходить в '
+      +userOption.notificationTime, false);
 
-    this.bot.editMessageText('Настройки профиля', {
+    _bot.editMessageText('Настройки профиля', {
       'chat_id': callbackQuery.from.id,
       'message_id': callbackQuery.message.message_id,
       'reply_markup': keyboards.keyboardSettings.reply_markup
