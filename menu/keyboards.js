@@ -3,7 +3,7 @@ module.exports.keyboardHelloMenu = {
     inline_keyboard: [
       [{ text: '⚙Настроить профиль', callback_data: 'settings' }],
       [{ text: '📅👥Расписание моей группы', callback_data: 'groupSchedule' }],
-      [{ text: '📅👤Расписание преподователя', callback_data: 'teacherSchedule' }]
+      [{ text: '📅👤Расписание преподавателя', callback_data: 'teacherSchedule' }]
     ]
   })
 };
