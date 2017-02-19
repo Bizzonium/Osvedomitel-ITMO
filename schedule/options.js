@@ -28,7 +28,11 @@ Object.defineProperty(WEEK_DAY, "TOMORROW", {
     var date = new Date();
     date.setDate(date.getDate() + 1);
     var weekDay = [7, 1, 2, 3, 4, 5, 6];
-    return weekDay[date.getDay()];
+    var tomorrow = date.getDay();
+    if(tomorrow == 0){
+      tomorrow = 1;
+    }
+    return weekDay[tomorrow];
   }
 });
 
@@ -41,7 +45,7 @@ module.exports.WEEK_DAY_STRING_LONG = {
   4: 'ЧЕТВЕРГ',
   5: 'ПЯТНИЦА',
   6: 'СУББОТА',
-  7: 'ВОСКРЕСЕНЬЕ'
+  0: 'ВОСКРЕСЕНЬЕ'
 };
 
 module.exports.WEEK_DAY_STRING_LONG_A = {
@@ -51,7 +55,7 @@ module.exports.WEEK_DAY_STRING_LONG_A = {
   4: 'четверг',
   5: 'пятницу',
   6: 'субботу',
-  7: 'воскресенье'
+  0: 'воскресенье'
 };
 
 module.exports.WEEK_PARITY_STRING = {

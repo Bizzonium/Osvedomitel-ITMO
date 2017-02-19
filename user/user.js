@@ -5,14 +5,7 @@ function User() {
 
 }
 
-
-// function callback(err,results) {
-//   console.log('Это из базы данных пришли резалты\n'+results.userID);
-//   this.userOptions = results;
-// }
-
 User.prototype.addUser = addUser;
-
 function addUser(userID) {
   var userOptions = {
     userID: userID,
@@ -39,7 +32,7 @@ function getOptions(userID, callback){
       getOptions(userID, function (userOptions) {
         callback(userOptions);
       });
-    }else {
+    } else {
       var userOptions = {
         userID: results[0].userID,
         notificationNextLesson: results[0].notificationNextLesson,

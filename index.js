@@ -1,20 +1,30 @@
 var bot = require('./telegrambot/telegramBot.js');
 
 /**
-* Модуль для работы с расписанием
-* @type {object}
-*/
-var user = require('./user/user.js');
-var user = new user();
+ *
+ * @type {Schedule}
+ */
+var User = require('./user/user.js');
+User = new User();
+
+/**
+ * Модуль для работы с расписанием
+ * @type {object}
+ */
 var Schedule = require('./schedule/schedule.js');
-var Schedule = new Schedule();
+Schedule = new Schedule();
 
 /**
  * Содержит экземпляр объекта модуля Menu
  * @type {Menu}
  */
 var Menu = require('./menu/menu.js');
-var Menu = new Menu(bot);
+Menu = new Menu(bot);
+
+var Notification = require('./notification/notification.js');
+Notification = new Notification(bot);
+Notification.run();
+
 bot.getMe().then(function (me) {
   console.log('Hi my name is %s! And i am running ✔️', me.username);
 });
@@ -67,7 +77,6 @@ bot.onText(/\/schedule ([0-9]{1,10}) ([0-8]) ([0-2])/, function(msg, match){
       bot.sendMessage(msg.from.id, schedule[i], options);
     }
   }, true);
-
 });
 
 bot.onText(/\/menu/, function(msg){
@@ -77,3 +86,4 @@ bot.onText(/\/menu/, function(msg){
 bot.on('callback_query', function(callbackQuery){
   Menu.callbackQueryHandler(callbackQuery);
 });
+

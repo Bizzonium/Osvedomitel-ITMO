@@ -158,7 +158,7 @@ Group.prototype.getSchedule = function(weekDay, weekParity, callback, getFormatt
 function format(collection) {
   var result = [];
   var schedule = collection.schedule;
-  console.log(collection);
+  //console.log(collection);
 
   var date = new Date();
   //date.setDate( date.getDate() + 1);
