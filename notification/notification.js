@@ -7,10 +7,12 @@ Schedule = new Schedule();
 var _bot;
 var enableNotificationOnNextDay;
 var enableNotificationOnNextLesson;
+var scheduleEndTime = ['8:20', '09:50', '11:30', '13:10', '15:00', '16:50', '18:30', '20:10'];
 var startTime;
 var endTime;
 //var currentTime;
 var deltaTime;
+var deltaTime2;
 var deltaTimezone = require('../config/timezoneDelta.js');
 
 function Notification(bot) {
@@ -52,6 +54,7 @@ Notification.prototype.run = function () {
   enableNotificationOnNextDay = true;
   enableNotificationOnNextLesson = true;
   runNotificationOnNextDay();
+  runNotificationOnNextLesson();
 };
 
 Notification.prototype.stop = function () {
@@ -78,7 +81,7 @@ function runNotificationOnNextDay() {
         addZero = '0';
       }
       var time = now.getHours() + ':' + addZero + now.getMinutes();
-      console.log(time);
+      console.log('NotificationOnNextDay: time = ' + time);
 
       //if(now.getHours() > 6 && nowPlusOneHour.getHours() < 1){
         if(now.getMinutes() % deltaTime == 0){
@@ -112,6 +115,52 @@ function runNotificationOnNextDay() {
 
 }
 
+function runNotificationOnNextLesson() {
+  return new Promise( function (resolved) {
+    if (enableNotificationOnNextLesson === true){
+      var now = new Date();
+      now.setHours(now.getHours() + deltaTimezone);
+      //var nowPlusOneHour = now;
+      //nowPlusOneHour.setHours(now.getHours() + 1);
+
+      var addZero = '';
+      if(now.getMinutes() < 10){
+        addZero = '0';
+      }
+      var time = now.getHours() + ':' + addZero + now.getMinutes();
+      console.log('NotificationOnNextLesson: time = ' + time);
+
+      //if(now.getHours() > 6 && nowPlusOneHour.getHours() < 1){
+      if(find(scheduleEndTime, time) !== -1){
+        var filter = {
+          "group": {
+            $ne: null
+          },
+          "notificationNextLesson": true
+        };
+        var userID;
+        var group;
+        Database.find("Users", filter, function(err, users) {
+          console.log(users);
+          for(var i = 0, len = users.length; i < len; i++){
+            console.log(users[i].userID);
+            userID = users[i].userID;
+            group = users[i].group;
+            Schedule.Group(group).getSchedule(now.getDate(), Schedule.WEEK_PARITY.BOTH, function (schedule) {
+              schedule = Schedule.Group(group).format(schedule, time);
+              sendSchedule(userID, schedule);
+            }, false);
+          }
+        });
+      }
+      //}
+      sleep(60000).then(runNotificationOnNextDay); // 600000 ms = 10 min
+    }
+    resolved();
+  });
+
+}
+
 function sendSchedule(userID, schedule) {
   var options = {
     parse_mode: "HTML"
@@ -119,6 +168,18 @@ function sendSchedule(userID, schedule) {
   for (var i = 0, len = schedule.length; i < len; i++) {
     _bot.sendMessage(userID, schedule[i], options);
   }
+}
+
+function find(array, value) {
+  if (array.indexOf) { // если метод существует
+    return array.indexOf(value);
+  }
+
+  for (var i = 0; i < array.length; i++) {
+    if (array[i] === value) return i;
+  }
+
+  return -1;
 }
 
 module.exports = Notification;
