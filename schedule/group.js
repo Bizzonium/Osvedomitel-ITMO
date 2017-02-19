@@ -155,21 +155,27 @@ Group.prototype.getSchedule = function(weekDay, weekParity, callback, getFormatt
 /**
  * Форматирует переданную коллекцию
  */
-function format(collection) {
+function format(collection, time) {
   var result = [];
   var schedule = collection.schedule;
   //console.log(collection);
 
-  var date = new Date();
-  //date.setDate( date.getDate() + 1);
-  var dateString = options.WEEK_DAY_STRING_LONG[date.getDay()].toLowerCase() + ', ' + date.getDate() + ' ' +
-                   options.MONTHS_STRING_LONG[date.getMonth()] + ' ' + date.getFullYear() + ' г.';
-  var par = options.WEEK_PARITY_STRING[collection.weekParity];
-  var week = (collection.weekParity == 0) ? 'обе недели' : 'всю '+ par + ' неделю';
-  var add = ' на ' + (collection.weekDay == 0 ? week : par + ' ' + options.WEEK_DAY_STRING_LONG_A[collection.weekDay]);
+  var message;
+  if(time !== 'undefined'){
+    message = 'Слудующая пара:\n';
+  }else{
+    var date = new Date();
+    //date.setDate( date.getDate() + 1);
+    var dateString = options.WEEK_DAY_STRING_LONG[date.getDay()].toLowerCase() + ', ' + date.getDate() + ' ' +
+      options.MONTHS_STRING_LONG[date.getMonth()] + ' ' + date.getFullYear() + ' г.';
+    var par = options.WEEK_PARITY_STRING[collection.weekParity];
+    var week = (collection.weekParity == 0) ? 'обе недели' : 'всю '+ par + ' неделю';
+    var add = ' на ' + (collection.weekDay == 0 ? week : par + ' ' + options.WEEK_DAY_STRING_LONG_A[collection.weekDay]);
 
-  var message = 'Расписание занятий для группы ' + collection.group_name + add +'.\n' +
-                '<i>Сегодня ' + dateString + '</i>';
+    message = 'Расписание занятий для группы ' + collection.group_name + add +'.\n' +
+      '<i>Сегодня ' + dateString + '</i>';
+  }
+
   result.push(message);
 
   if(schedule.length === 0){
@@ -183,10 +189,25 @@ function format(collection) {
   for(var dayIndex = 0, len = group.length;  dayIndex < len; dayIndex++){
     var day = group[dayIndex];
     date.setDate( date.getDate() + dayIndex);
-    message = '<b>'+options.WEEK_DAY_STRING_LONG[day.weekday]+'</b>' + '\n';
+    if(time !== 'undefined') {
+      message = '';
+    }else{
+      message = '<b>'+options.WEEK_DAY_STRING_LONG[day.weekday]+'</b>' + '\n';
+    }
 
     for(var lessonIndex = 0, len2 = day.lessons.length; lessonIndex < len2; lessonIndex++){
       var lesson = day.lessons[lessonIndex];
+      if(time !== 'undefined'){
+        var timeSplit = time.split(':');
+        var timePlus10 = timeSplit[0] + ':' + (timeSplit[1]+10);
+        var timePlus20 = timeSplit[0] + ':' + (timeSplit[1]+20);
+        var flag = lesson.time_start === timePlus10 || lesson.time_start === timePlus20;
+        if(flag){
+
+        }else{
+          continue;
+        }
+      }
 
       var type = '';
       switch (lesson.type){
@@ -215,9 +236,16 @@ function format(collection) {
                 teach_name +
                 '<i>' + aud_name + lesson.auditories[0].auditory_address + '</i>\n'+
                 '\n';
+
+      if(flag){
+        break;
+      }
     }
     message += '\n';
     result.push(message);
+    if(flag){
+      break;
+    }
   }
   return result;
 }
