@@ -168,7 +168,7 @@ Group.prototype.format = format;
  *
  * @function
  * @param {object} collection
- * @param {number} [time]
+ * @param {string} [time]
  * @returns {Array} массив сообщений
  */
 function format(collection, time) {
@@ -226,8 +226,17 @@ function format(collection, time) {
         var timeDatePlus20 = new Date(timeDate);
         timeDatePlus20.setMinutes(timeDatePlus20.getMinutes() + 20);
 		
-        var timePlus10 = timeDatePlus10.getHours() + ':' + timeDatePlus10.getMinutes();
-        var timePlus20 = timeDatePlus20.getHours() + ':' + timeDatePlus20.getMinutes();
+				var addzero1 = '';
+				var addzero2 = '';
+				if (timeDatePlus10.getMinutes() < 10){
+					addzero1 = '0';
+				}
+				if (timeDatePlus20.getMinutes() < 10){
+					addzero2 = '0';
+				}
+		
+        var timePlus10 = timeDatePlus10.getHours() + ':' + addzero1 + timeDatePlus10.getMinutes();
+        var timePlus20 = timeDatePlus20.getHours() + ':' + addzero2 + timeDatePlus20.getMinutes();
         flag = (lesson.time_start == timePlus10 || lesson.time_start == timePlus20);
         if(flag === true){
 
@@ -268,8 +277,12 @@ function format(collection, time) {
         break;
       }
     }
-    message += '\n';
-    result.push(message);
+	  if(flag !== true){
+      message += '\n';
+	  }
+	  if(message.trim().length > 0){
+        result.push(message);
+	  }
     if(flag === true){
       break;
     }

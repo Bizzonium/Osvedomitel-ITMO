@@ -15,7 +15,7 @@ Schedule = new Schedule();
 var _bot;
 var enableNotificationOnNextDay;
 var enableNotificationOnNextLesson;
-var scheduleEndTime = ['8:20', '09:50', '11:30', '13:10', '15:00', '16:50', '18:30', '20:10'];
+var scheduleEndTime = ['8:20', '9:50', '11:30', '13:10', '15:00', '16:50', '18:30', '20:10'];
 var startTime;
 var endTime;
 var currentTime;
