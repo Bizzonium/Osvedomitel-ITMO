@@ -1,3 +1,7 @@
+/**
+ * Enum разметка клавиатуры для главного меню
+ * @enum {object}
+ */
 module.exports.keyboardHelloMenu = {
   reply_markup: JSON.stringify({
     inline_keyboard: [
@@ -8,6 +12,10 @@ module.exports.keyboardHelloMenu = {
   })
 };
 
+/**
+ * Enum разметка клавиатуры для дней недели
+ * @enum {object}
+ */
 module.exports.keyboardDayOfWeek = {
   reply_markup: JSON.stringify({
     inline_keyboard: [
@@ -19,7 +27,10 @@ module.exports.keyboardDayOfWeek = {
   })
 };
 
-
+/**
+ * Enum разметка клавиатуры для чётности недели
+ * @enum {object}
+ */
 module.exports.keyboardOddOrEven = {
   reply_markup: JSON.stringify({
     inline_keyboard: [
@@ -29,7 +40,10 @@ module.exports.keyboardOddOrEven = {
   })
 };
 
-
+/**
+ * Enum разметка клавиатуры для настроек
+ * @enum {object}
+ */
 module.exports.keyboardSettings = {
   reply_markup: JSON.stringify({
     inline_keyboard: [
@@ -41,6 +55,10 @@ module.exports.keyboardSettings = {
   })
 };
 
+/**
+ * Enum разметка клавиатуры выбора да/нет
+ * @enum {object}
+ */
 module.exports.keyboardYesOrNo = {
   reply_markup: JSON.stringify({
     inline_keyboard: [
@@ -49,6 +67,10 @@ module.exports.keyboardYesOrNo = {
   })
 };
 
+/**
+ * Enum разметка клавиатуры для выбора интервала времени уведомлений
+ * @enum {object}
+ */
 module.exports.keyboardNotificationTime = {
   reply_markup: JSON.stringify({
     inline_keyboard: [
@@ -58,6 +80,10 @@ module.exports.keyboardNotificationTime = {
   })
 };
 
+/**
+ * Enum разметка клавиатуры для выбора времени уведомлений в интервале утра
+ * @enum {object}
+ */
 module.exports.keyboardChooseTimeMorning = {
  reply_markup: JSON.stringify(({
    inline_keyboard: [
@@ -70,6 +96,10 @@ module.exports.keyboardChooseTimeMorning = {
  }))
 };
 
+/**
+ * Enum разметка клавиатуры для выбора времени уведомлений в интервале обеда
+ * @enum {object}
+ */
 module.exports.keyboardChooseTimeLunch = {
   reply_markup: JSON.stringify(({
     inline_keyboard: [
@@ -82,6 +112,10 @@ module.exports.keyboardChooseTimeLunch = {
   }))
 };
 
+/**
+ * Enum разметка клавиатуры для выбора времени уведомлений в интервале вечера
+ * @enum {object}
+ */
 module.exports.keyboardChooseTimeEvening = {
   reply_markup: JSON.stringify(({
     inline_keyboard: [

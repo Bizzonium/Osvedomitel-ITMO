@@ -1,6 +1,6 @@
 /**
  * Модуль для работы с telegram-ботами
- * @type {object}
+ * @type {TelegramBot}
  */
 global.TelegramBot = require('node-telegram-bot-api');
 

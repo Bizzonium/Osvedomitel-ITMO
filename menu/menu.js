@@ -5,17 +5,33 @@
 var keyboards = require('./keyboards.js');
 
 /**
- *
+ * Модуль для работы с пользователями
  * @type {User}
  */
 var User = require('../user/user.js');
 User = new User();
+/**
+ * Модуль для работы с расписанием
+ * @type {Schedule}
+ */
+var Schedule = require('../schedule/schedule.js');
 
+/**
+ * Пользовательские настройки
+ * @type {UserOptions}
+ */
+//var UserOptions = require('../user/userOptions.js');
 
+/**
+ * Содержит экземпляр класса TelegramBot
+ * @type {TelegramBot}
+ */
 var _bot;
+
 /**
  * Создаёт экземпляр класса Menu
  *
+ * @param {TelegramBot} bot экземпляр класса TelegramBot
  * @this {Menu}
  * @constructor
  */
@@ -25,22 +41,11 @@ function Menu(bot) {
 }
 
 /**
+ * Показывает стартовое меню
  *
- * @type {Schedule}
+ * @function
+ * @param {object} msg принимает объект message от бота
  */
-var Schedule = require('../schedule/schedule.js');
-
-//var UserOptions = require('../user/userOptions.js');
-
-
-//TODO: сделать подгрузку из БД
-/**
- * Пользовательские настройки
- * @type {object}
- */
-
-
-
 Menu.prototype.showStartMenu = function (msg) {
 
   _bot.sendMessage(msg.from.id, 'Преветствую тебя, ' + msg.chat.first_name + '! ' +
@@ -54,8 +59,20 @@ Menu.prototype.showStartMenu = function (msg) {
   });
 };
 
+/**
+ * @function
+ * @type {sendSchedule}
+ */
 Menu.prototype.sendSchedule = sendSchedule;
-  function sendSchedule(schedule, chatID) {
+
+/**
+ * Отправляет сообщения с расписанием
+ *
+ * @function
+ * @param schedule
+ * @param chatID
+ */
+function sendSchedule(schedule, chatID) {
   var options = {
     parse_mode: "HTML"
   };
@@ -66,9 +83,10 @@ Menu.prototype.sendSchedule = sendSchedule;
 }
 
 /**
- * Показать главное меню
+ * Показывает главное меню
  *
- * @param {string} msg
+ * @function
+ * @param {object} msg принимает объект message от бота
  */
 Menu.prototype.showHelloMenu = function (msg) {
   _bot.sendMessage(msg.chat.id, 'Выбери, что ты хочешь сделать', keyboards.keyboardHelloMenu);
@@ -78,7 +96,8 @@ Menu.prototype.showHelloMenu = function (msg) {
 /**
  * Обработчик событий callbackQuery
  *
- * @param {object} callbackQuery
+ * @function
+ * @param {object} callbackQuery принимает объект callbackQuery от бота
  */
 Menu.prototype.callbackQueryHandler = function(callbackQuery) {
   //var userOption = new UserOptions(callbackQuery.from.id).userOption;
@@ -322,8 +341,12 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
   }
 };
 
-module.exports = Menu;
-
+/**
+ * Ждёт ответ от пользователя
+ *
+ * @function
+ * @param {object} callbackQuery принимает объект callbackQuery от бота
+ */
 function waitForAnswer(callbackQuery) {
   _bot.onText(/[A-Z][0-9]{4}/,function (msg, match) {
     if(msg.from.id === callbackQuery.from.id){
@@ -334,12 +357,12 @@ function waitForAnswer(callbackQuery) {
       };
       console.log('ДО\n');
       console.log(callbackQuery);
-       _bot.answerCallbackQuery(callbackQuery.id,'Отлично я запомнил твою группу: '+match[0],false);
+      _bot.answerCallbackQuery(callbackQuery.id,'Отлично я запомнил твою группу: '+match[0],false);
 
-       console.log('ПОСЛЕ\n');
+      console.log('ПОСЛЕ\n');
       console.log(callbackQuery);
 
-       User.updateInfo(callbackQuery.from.id, updateFilter);
+      User.updateInfo(callbackQuery.from.id, updateFilter);
 
       _bot.sendMessage(callbackQuery.from.id,'Настройки профиля', {
         'chat_id': callbackQuery.from.id,
@@ -350,3 +373,5 @@ function waitForAnswer(callbackQuery) {
 
   });
 }
+
+module.exports = Menu;

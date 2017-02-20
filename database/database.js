@@ -21,7 +21,7 @@ function Database() {
 }
 
 /**
- * Пример работы с этим модулем:
+ * @example <caption>Пример работы с этим модулем:</caption>
  *   var Database = require('./database/database.js');
  *   Database = new Database();
  *   var object = {
@@ -35,11 +35,9 @@ function Database() {
  *
  * подробнее тут: http://metanit.com/web/nodejs/6.1.php
  * возможно этот модуль не будет работать. ещё ни разу его не тестил
- */
-
-/**
- * Вставляет objects в collection и выполняет callback-функцию
  *
+ * @description Вставляет objects в collection и выполняет callback-функцию
+ * @function
  * @param {string} collection коллекция
  * @param {object} objects объекты, которые нужно вставить
  * @param {object} callback callback-функция, получающая результат на обработку
@@ -63,6 +61,7 @@ Database.prototype.insert = function(collection, objects, callback){
 /**
  * Ищет объекты в collection просеивая через filter и выполняет callback-функцию
  *
+ * @function
  * @param {string} collection коллекция
  * @param {object} filter фильтр поиска
  * @param {object} callback callback-функция, получающая результат на обработку
@@ -86,6 +85,7 @@ Database.prototype.find = function (collection, filter, callback) {
 /**
  * Удаляет объекты в collection просеивая через filter и выполняет callback-функцию
  *
+ * @function
  * @param {string} collection коллекция
  * @param {object} filter фильтр поиска
  * @param {object} callback callback-функция, получающая результат на обработку
@@ -107,8 +107,9 @@ Database.prototype.delete = function (collection, filter, callback) {
 };
 
 /**
- * Удаляет объекты в collection просеивая через filter и выполняет callback-функцию
+ * Обновляет объекты в collection просеивая через filter и меняет по updateFilter и выполняет callback-функцию
  *
+ * @function
  * @param {string} collection коллекция (название коллекции)
  * @param {object} filter фильтр поиска (уникальный идентификатор по которому необхожимо найти нужного пользователся
  * @param {object} updateFilter параметры замены

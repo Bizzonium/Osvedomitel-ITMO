@@ -1,11 +1,32 @@
+/**
+ * Модуль для работы с базой данных MongoDB
+ * @type {Database}
+ */
 var Database = require('../database/database.js');
 Database = new Database();
 
+/**
+ * Создаёт экземпляр класса User
+ *
+ * @this {User}
+ * @constructor
+ */
 function User() {
 
 }
 
+/**
+ * @function
+ * @type {addUser}
+ */
 User.prototype.addUser = addUser;
+
+/**
+ * Добавляет пользователя в базу данных
+ *
+ * @function
+ * @param {number} userID ID пользователя
+ */
 function addUser(userID) {
   var userOptions = {
     userID: userID,
@@ -20,7 +41,19 @@ function addUser(userID) {
   });
 }
 
+/**
+ * @function
+ * @type {getOptions}
+ */
 User.prototype.getOptions = getOptions;
+
+/**
+ * Получает опции пользователя
+ *
+ * @function
+ * @param {nimber} userID ID пользователя
+ * @param {function} callback
+ */
 function getOptions(userID, callback){
   var filter = {
    userID: userID
@@ -45,7 +78,19 @@ function getOptions(userID, callback){
   });
 }
 
+/**
+ * @function
+ * @type {updateInfo}
+ */
 User.prototype.updateInfo = updateInfo;
+
+/**
+ * Обновляет опции пользователя в базе данных
+ *
+ * @function
+ * @param {number} userID ID пользователя
+ * @param {object} userOptions опции пользователя
+ */
 function updateInfo(userID,userOptions) {
   var filter = {
     userID: userID
@@ -54,6 +99,4 @@ function updateInfo(userID,userOptions) {
   });
 }
 
-
 module.exports = User;
-///module.exports.userOptions = this.userOptions;

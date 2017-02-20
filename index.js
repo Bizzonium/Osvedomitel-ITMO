@@ -1,40 +1,47 @@
+/**
+ * Фреймворк для работы с Telegram API
+ * @type {TelegramBot}
+ */
 var bot = require('./telegrambot/telegramBot.js');
 
 /**
- *
- * @type {Schedule}
- */
-var User = require('./user/user.js');
-User = new User();
-
-/**
  * Модуль для работы с расписанием
- * @type {object}
+ * @type {Schedule}
  */
 var Schedule = require('./schedule/schedule.js');
 Schedule = new Schedule();
 
 /**
- * Содержит экземпляр объекта модуля Menu
+ * Модуль для работы с меню
  * @type {Menu}
  */
 var Menu = require('./menu/menu.js');
 Menu = new Menu(bot);
 
+/**
+ * Модуль для работы с уведомлениями
+ * @type {Notification}
+ */
 var Notification = require('./notification/notification.js');
 Notification = new Notification(bot);
 Notification.run();
 
+/**
+ * Для отладки.
+ */
 bot.getMe().then(function (me) {
   console.log('Hi my name is %s! And i am running ✔️', me.username);
 });
 
+/**
+ * Ожидает команду /start
+ */
 bot.onText(/\/start/, function(msg){
   Menu.showStartMenu(msg);
 });
 
 /**
- * Тестовая команда для проверки работы модуля расписаний
+ * Ожидает команду /schedule [groupName] [weekDay] [weekParity]
  */
 bot.onText(/\/schedule ([A-Z][0-9]{4}) ([0-8]) ([0-2])/, function(msg, match){
   var options = {
@@ -58,6 +65,9 @@ bot.onText(/\/schedule ([A-Z][0-9]{4}) ([0-8]) ([0-2])/, function(msg, match){
 
 });
 
+/**
+ * Ожидает команду /schedule [teacherID] [weekDay] [weekParity]
+ */
 bot.onText(/\/schedule ([0-9]{1,10}) ([0-8]) ([0-2])/, function(msg, match){
   var options = {
     parse_mode: "HTML"
@@ -79,10 +89,16 @@ bot.onText(/\/schedule ([0-9]{1,10}) ([0-8]) ([0-2])/, function(msg, match){
   }, true);
 });
 
+/**
+ * Ожидает команду /menu
+ */
 bot.onText(/\/menu/, function(msg){
   Menu.showHelloMenu(msg);
 });
 
+/**
+ * Callback Query Handler
+ */
 bot.on('callback_query', function(callbackQuery){
   Menu.callbackQueryHandler(callbackQuery);
 });

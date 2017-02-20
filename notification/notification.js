@@ -1,6 +1,14 @@
+/**
+ * Модуль для работы с базой данных MongoDB
+ * @type {Database}
+ */
 var Database = require('../database/database.js');
 Database = new Database();
 
+/**
+ * Модуль для работы с расписанием
+ * @type {Schedule}
+ */
 var Schedule = require('../schedule/schedule.js');
 Schedule = new Schedule();
 
@@ -12,9 +20,15 @@ var startTime;
 var endTime;
 var currentTime;
 var deltaTime;
-var deltaTime2;
 var deltaTimezone = require('../config/timezoneDelta.js');
 
+/**
+ * Создаёт экземпляр класса Notification
+ *
+ * @param {TelegramBot} bot экземпляр класса TelegramBot
+ * @this {Notification}
+ * @constructor
+ */
 function Notification(bot) {
   _bot = bot;
   enableNotificationOnNextDay = false;
@@ -50,6 +64,11 @@ function Notification(bot) {
 //   }
 // }
 
+/**
+ * Запускает асинхронные функции отправки уведомлений
+ *
+ * @function
+ */
 Notification.prototype.run = function () {
   enableNotificationOnNextDay = true;
   enableNotificationOnNextLesson = true;
@@ -57,17 +76,33 @@ Notification.prototype.run = function () {
   runNotificationOnNextLesson();
 };
 
+/**
+ * Останавливает асинхронные функции отправки уведомлений
+ *
+ * @function
+ */
 Notification.prototype.stop = function () {
   enableNotificationOnNextDay = false;
   enableNotificationOnNextLesson = false;
 };
 
+/**
+ * Останавливает на время выполнение фукнции
+ *
+ * @function
+ * @param {number} time время в мс
+ */
 function sleep (time) {
   return new Promise(function(resolve){
     setTimeout(resolve, time);
   });
 }
 
+/**
+ * Запускает асинхронную фукнцию уведомления расписанием на след. день
+ *
+ * @function
+ */
 function runNotificationOnNextDay() {
   return new Promise( function (resolved) {
     if (enableNotificationOnNextDay === true){
@@ -115,6 +150,11 @@ function runNotificationOnNextDay() {
 
 }
 
+/**
+ * Запускает асинхронную фукнцию уведомления расписанием след. пары
+ *
+ * @function
+ */
 function runNotificationOnNextLesson() {
   return new Promise( function (resolved) {
     if (enableNotificationOnNextLesson === true){
@@ -157,6 +197,13 @@ function runNotificationOnNextLesson() {
 
 }
 
+/**
+ * Отправляет расписания
+ *
+ * @function
+ * @param {number} userID ID пользователя
+ * @param {string} schedule сообщения с расписанием
+ */
 function sendSchedule(userID, schedule) {
   var options = {
     parse_mode: "HTML"
@@ -166,6 +213,14 @@ function sendSchedule(userID, schedule) {
   }
 }
 
+/**
+ * Ищет совпадения в массиве
+ *
+ * @function
+ * @param array
+ * @param value
+ * @returns {number} индекс элемента в массиве или -1
+ */
 function find(array, value) {
   if (array.indexOf) { // если метод существует
     return array.indexOf(value);

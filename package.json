@@ -1,6 +1,6 @@
 {
   "name": "osvedomitel-itmo",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Telegram-bot that will provide you with all the necessary information during your studies at the ITMO University",
   "main": "index.js",
   "scripts": {
@@ -34,7 +34,6 @@
   "dependencies": {
     "mongodb": "^2.2.22",
     "node-telegram-bot-api": "^0.26.0",
-    "request": "^2.79.0",
-    "winston": "^2.3.1"
+    "request": "^2.79.0"
   }
 }

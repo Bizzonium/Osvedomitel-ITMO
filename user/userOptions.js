@@ -1,5 +1,9 @@
 /**
- *
+ * ВНИМАНИЕ! Не работает... сохранено на будущее
+ */
+
+/**
+ * Модуль для работы с пользователями
  * @type {User}
  */
 var User = require('../user/user.js');
@@ -13,7 +17,9 @@ var _notificationDay = undefined;
 var _notificationTime = undefined;
 
 /**
+ * Создаёт экземпляр класса UserOptions
  *
+ * @this {UserOptions}
  * @param userID
  * @constructor
  */

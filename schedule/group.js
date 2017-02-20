@@ -1,18 +1,18 @@
 /**
- * Содержит путями к API ISU
+ * Содержит пути к API ISU
  * @type {object}
  */
 const paths = require('../config/IsuApiURL.js');
 
 /**
- * Содержит токен для использования API ISUПодключаем файл с путями к API ISU
+ * Содержит токен для использования API ISU
  * @type {string}
  */
 const IsuApiToken = require('../config/IsuApiToken.js');
 
 /**
  * Модуль для работы с http[s]-запросами
- * @type {function}
+ * @type {request}
  */
 var request = require('request');
 
@@ -23,14 +23,16 @@ var request = require('request');
 const options = require('./options.js');
 
 /**
- * Содержит дни недели
- * @type {object}
+ * Enum дни недели
+ * @readonly
+ * @enum {number}
  */
 const WEEK_DAY = options.WEEK_DAY;
 
 /**
- * Содержит чётность недели
- * @type {object}
+ * Enum чётность недели
+ * @readonly
+ * @enum {object}
  */
 const WEEK_PARITY = options.WEEK_PARITY;
 
@@ -45,14 +47,15 @@ function Group(groupName) {
  this.groupName = groupName;
 }
 
-
 /**
  * Получает расписание занятий групп по указанным параметрам и передаёт результат в callback-функцию
+ *
+ * @function
  * @param {number} weekDay день недели
  * @param {number} weekParity чётность недели
  * @param {function} callback callback-фукнция, получающая результат на обработку
- * @param {boolean} getFormatted вернуть не коллекцию, а форматированный текст
- * @param {number} userID userID
+ * @param {boolean} [getFormatted] вернуть не коллекцию, а форматированный текст
+ * @param {number} [userID] ID пользователя
  */
 Group.prototype.getSchedule = function(weekDay, weekParity, callback, getFormatted, userID) {
   /**
@@ -155,7 +158,18 @@ Group.prototype.getSchedule = function(weekDay, weekParity, callback, getFormatt
 };
 
 /**
+ * @function
+ * @type {format}
+ */
+Group.prototype.format = format;
+
+/**
  * Форматирует переданную коллекцию
+ *
+ * @function
+ * @param {object} collection
+ * @param {number} [time]
+ * @returns {Array} массив сообщений
  */
 function format(collection, time) {
   var result = [];
@@ -254,6 +268,5 @@ function format(collection, time) {
   }
   return result;
 }
-Group.prototype.format = format;
 
 module.exports = Group;
