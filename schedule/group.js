@@ -220,10 +220,10 @@ function format(collection, time) {
         timeDate.setHours(+timeSplit[0]);
         timeDate.setMinutes(+timeSplit[1]);
 
-        var timeDatePlus10 = timeDate;
+        var timeDatePlus10 = new Date(timeDate);
         timeDatePlus10.setMinutes(timeDatePlus10.getMinutes() + 10);
         
-        var timeDatePlus20 = timeDate;
+        var timeDatePlus20 = new Date(timeDate);
         timeDatePlus20.setMinutes(timeDatePlus20.getMinutes() + 20);
 		
         var timePlus10 = timeDatePlus10.getHours() + ':' + timeDatePlus10.getMinutes();
