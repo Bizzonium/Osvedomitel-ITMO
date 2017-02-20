@@ -52,8 +52,9 @@ function Group(groupName) {
  * @param {number} weekParity чётность недели
  * @param {function} callback callback-фукнция, получающая результат на обработку
  * @param {boolean} getFormatted вернуть не коллекцию, а форматированный текст
+ * @param {number} userID userID
  */
-Group.prototype.getSchedule = function(weekDay, weekParity, callback, getFormatted) {
+Group.prototype.getSchedule = function(weekDay, weekParity, callback, getFormatted, userID) {
   /**
    * Опции для запроса
    * Подробнее: https://www.npmjs.com/package/request#requestoptions-callback
@@ -79,6 +80,7 @@ Group.prototype.getSchedule = function(weekDay, weekParity, callback, getFormatt
       result.group_name = groups[0].group_name;
       result.weekDay = weekDay;
       result.weekParity = weekParity;
+      result.userID = userID;
 
       var group = {};
       group.group_name = groups[0].group_name;
@@ -144,7 +146,7 @@ Group.prototype.getSchedule = function(weekDay, weekParity, callback, getFormatt
       }
 
       if(getFormatted){
-        callback(format(result));
+        callback(format(result, false));
       }else{
         callback(result);
       }
@@ -160,11 +162,11 @@ function format(collection, time) {
   var schedule = collection.schedule;
   //console.log(collection);
 
+  var date = new Date();
   var message;
-  if(time !== 'undefined'){
+  if(time != false){
     message = 'Слудующая пара:\n';
   }else{
-    var date = new Date();
     //date.setDate( date.getDate() + 1);
     var dateString = options.WEEK_DAY_STRING_LONG[date.getDay()].toLowerCase() + ', ' + date.getDate() + ' ' +
       options.MONTHS_STRING_LONG[date.getMonth()] + ' ' + date.getFullYear() + ' г.';
@@ -185,11 +187,11 @@ function format(collection, time) {
   }
 
   var group = schedule[0].study_schedule;
-
+  var flag = false;
   for(var dayIndex = 0, len = group.length;  dayIndex < len; dayIndex++){
     var day = group[dayIndex];
     date.setDate( date.getDate() + dayIndex);
-    if(time !== 'undefined') {
+    if(time != false) {
       message = '';
     }else{
       message = '<b>'+options.WEEK_DAY_STRING_LONG[day.weekday]+'</b>' + '\n';
@@ -197,12 +199,15 @@ function format(collection, time) {
 
     for(var lessonIndex = 0, len2 = day.lessons.length; lessonIndex < len2; lessonIndex++){
       var lesson = day.lessons[lessonIndex];
-      if(time !== 'undefined'){
+      if(time != false){
         var timeSplit = time.split(':');
-        var timePlus10 = timeSplit[0] + ':' + (timeSplit[1]+10);
-        var timePlus20 = timeSplit[0] + ':' + (timeSplit[1]+20);
-        var flag = lesson.time_start === timePlus10 || lesson.time_start === timePlus20;
-        if(flag){
+        var timeSplit1 = timeSplit[1];
+        var timeSplit10 = +timeSplit1 + 10;
+        var timeSplit20 = +timeSplit1 + 20;
+        var timePlus10 = timeSplit[0] + ':' + timeSplit10;
+        var timePlus20 = timeSplit[0] + ':' + timeSplit20;
+        flag = (lesson.time_start == timePlus10 || lesson.time_start == timePlus20);
+        if(flag === true){
 
         }else{
           continue;
@@ -237,13 +242,13 @@ function format(collection, time) {
                 '<i>' + aud_name + lesson.auditories[0].auditory_address + '</i>\n'+
                 '\n';
 
-      if(flag){
+      if(flag === true){
         break;
       }
     }
     message += '\n';
     result.push(message);
-    if(flag){
+    if(flag === true){
       break;
     }
   }

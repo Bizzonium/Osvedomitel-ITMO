@@ -10,7 +10,7 @@ var enableNotificationOnNextLesson;
 var scheduleEndTime = ['8:20', '09:50', '11:30', '13:10', '15:00', '16:50', '18:30', '20:10'];
 var startTime;
 var endTime;
-//var currentTime;
+var currentTime;
 var deltaTime;
 var deltaTime2;
 var deltaTimezone = require('../config/timezoneDelta.js');
@@ -130,31 +130,27 @@ function runNotificationOnNextLesson() {
       var time = now.getHours() + ':' + addZero + now.getMinutes();
       console.log('NotificationOnNextLesson: time = ' + time);
 
-      //if(now.getHours() > 6 && nowPlusOneHour.getHours() < 1){
-      if(find(scheduleEndTime, time) !== -1){
+      if(find(scheduleEndTime, time) !== -1 && now.getDay != 0 && currentTime != time){
+        currentTime = time;
         var filter = {
           "group": {
             $ne: null
           },
           "notificationNextLesson": true
         };
-        var userID;
-        var group;
         Database.find("Users", filter, function(err, users) {
           console.log(users);
           for(var i = 0, len = users.length; i < len; i++){
-            console.log(users[i].userID);
-            userID = users[i].userID;
-            group = users[i].group;
-            Schedule.Group(group).getSchedule(now.getDate(), Schedule.WEEK_PARITY.BOTH, function (schedule) {
-              schedule = Schedule.Group(group).format(schedule, time);
+            Schedule.Group(users[i].group).getSchedule(now.getDay(), Schedule.WEEK_PARITY.BOTH, function (schedule) {
+              var userID = schedule.userID;
+              var groupName = schedule.groupName;
+              schedule = Schedule.Group(groupName).format(schedule, time);
               sendSchedule(userID, schedule);
-            }, false);
+            }, false, users[i].userID);
           }
         });
       }
-      //}
-      sleep(60000).then(runNotificationOnNextDay); // 600000 ms = 10 min
+      sleep(60000).then(runNotificationOnNextLesson); // 600000 ms = 10 min
     }
     resolved();
   });
