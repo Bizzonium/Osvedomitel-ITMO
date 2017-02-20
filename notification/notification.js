@@ -185,7 +185,9 @@ function runNotificationOnNextLesson() {
               var userID = schedule.userID;
               var groupName = schedule.groupName;
               schedule = Schedule.Group(groupName).format(schedule, time);
-              sendSchedule(userID, schedule);
+              if(schedule.length > 1){
+                sendSchedule(userID, schedule);
+              }
             }, false, users[i].userID);
           }
         });
