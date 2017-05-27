@@ -15,6 +15,12 @@ User = new User();
  * @type {Schedule}
  */
 var Schedule = require('../schedule/schedule.js');
+/**
+ * Модуль для работы с методами БД
+ * @type {User}
+ */
+var Database = require('../database/database.js');
+Database = new Database();
 
 /**
  * Пользовательские настройки
@@ -56,6 +62,8 @@ Menu.prototype.showStartMenu = function (msg) {
     'расписание на нечетный понедельник)️, но скоро оно будет работать как нужно😉')
     .then (function () {
     return  _bot.sendMessage(msg.from.id, 'Выбери, что ты хочешь сделать', keyboards.keyboardHelloMenu)
+  });
+  User.getOptions(msg.from.id, function () {
   });
 };
 
@@ -339,6 +347,15 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
       });
     });
   }
+
+
+  if (callbackQuery.data === 'sendMSG'){
+    _bot.onText(/(.+)/,function (msg, match) {
+      console.log(match[0]);
+      callbackQuery.data = null;
+    });
+  }
+
 };
 
 /**
@@ -348,30 +365,75 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
  * @param {object} callbackQuery принимает объект callbackQuery от бота
  */
 function waitForAnswer(callbackQuery) {
+  var flag = 1;
   _bot.onText(/[A-Z][0-9]{4}/,function (msg, match) {
-    if(msg.from.id === callbackQuery.from.id){
-      updateFilter = {
-        $set: {
-          group: match[0]
-        }
-      };
-      console.log('ДО\n');
-      console.log(callbackQuery);
-      _bot.answerCallbackQuery(callbackQuery.id,'Отлично я запомнил твою группу: '+match[0],false);
+    if(msg.from.id === callbackQuery.from.id) {
+      if (flag == 1) {
+        updateFilter = {
+          $set: {
+            group: match[0]
+          }
+        };
+        console.log('ДО\n');
+        console.log(callbackQuery);
+        _bot.answerCallbackQuery(callbackQuery.id, 'Отлично я запомнил твою группу: ' + match[0], false);
 
-      console.log('ПОСЛЕ\n');
-      console.log(callbackQuery);
+        console.log('ПОСЛЕ\n');
+        console.log(callbackQuery);
 
-      User.updateInfo(callbackQuery.from.id, updateFilter);
+        User.updateInfo(callbackQuery.from.id, updateFilter);
 
-      _bot.sendMessage(callbackQuery.from.id,'Настройки профиля', {
-        'chat_id': callbackQuery.from.id,
-        'message_id': callbackQuery.message.message_id,
-        'reply_markup': keyboards.keyboardSettings.reply_markup
-      });
+        _bot.sendMessage(callbackQuery.from.id, 'Настройки профиля', {
+          'chat_id': callbackQuery.from.id,
+          'message_id': callbackQuery.message.message_id,
+          'reply_markup': keyboards.keyboardSettings.reply_markup
+        });
+        flag = 0;
+      }
     }
-
   });
 }
+
+Menu.prototype.adminPanel = function (msg) {
+  if ((msg.from.id == "91128691")||(msg.from.id == "196935540")){
+   // console.log(msg.callback_data);
+    _bot.sendMessage(msg.from.id,'Привет мой создатель! Что ты хочешь сделать?', {
+      'chat_id': msg.from.id,
+      'message_id': msg.id,
+      'reply_markup': JSON.stringify({
+        inline_keyboard: [
+          [{ text: 'Отправить всем сообщение', callback_data: 'sendMSG' }],
+          [{ text: 'Захватить США', callback_data: 'groupSchedule' }],
+          [{ text: 'Проголосовать за Навального', callback_data: 'Naval' }]
+        ]
+      })
+    });
+  }
+};
+
+Menu.prototype.broadcast = function (msg) {
+  if ((msg.from.id == "91128691")||(msg.from.id == "196935540")) {
+    var flag = 1;
+    _bot.onText(/(.+)/, function (msg, match) {
+      if ((msg.from.id == "91128691")||(msg.from.id == "196935540")) {
+        if (flag == 1) {
+          var filter = {};
+          Database.find('test', null, function (err, results) {
+            for(var i = 0, len = results.length; i < len; i++) {
+              //console.log('VOT ON: ' + results[i].userID + '\n');
+              _bot.sendMessage(results[i].userID, '' + match[1]);
+            }
+          });
+          //_bot.sendMessage('196935540', '' + match[1]);
+          flag = 0;
+        }
+      }
+    });
+  }
+
+
+};
+
+
 
 module.exports = Menu;

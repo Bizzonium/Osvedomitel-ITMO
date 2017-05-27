@@ -36,7 +36,7 @@ function addUser(userID) {
     notificationTime: null
   };
 
-  Database.insert('Users',userOptions,function (err, results) {
+  Database.insert('test',userOptions,function (err, results) {
     //console.log('это опции вернулись\n'+results);
   });
 }
@@ -58,7 +58,7 @@ function getOptions(userID, callback){
   var filter = {
    userID: userID
  };
-  Database.find("Users",filter, function(err, results) {
+  Database.find('test',filter, function(err, results) {
     //console.log(results);
     if (results.length == 0){
       addUser(userID);
@@ -95,7 +95,7 @@ function updateInfo(userID,userOptions) {
   var filter = {
     userID: userID
   };
-  Database.update("Users", filter, userOptions,function (err, result) {
+  Database.update('test', filter, userOptions,function (err, result) {
   });
 }
 

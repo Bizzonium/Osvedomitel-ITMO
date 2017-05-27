@@ -95,7 +95,12 @@ bot.onText(/\/schedule ([0-9]{1,10}) ([0-8]) ([0-2])/, function(msg, match){
 bot.onText(/\/menu/, function(msg){
   Menu.showHelloMenu(msg);
 });
-
+bot.onText(/\/admin/, function(msg){
+  Menu.adminPanel(msg);
+});
+bot.onText(/\/broadcast/, function(msg){
+  Menu.broadcast(msg);
+});
 /**
  * Callback Query Handler
  */

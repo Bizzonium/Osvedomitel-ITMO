@@ -131,7 +131,7 @@ function runNotificationOnNextDay() {
             }
           };
           var userID;
-          Database.find("Users", filter, function(err, users) {
+          Database.find("test", filter, function(err, users) {
             console.log(users);
             for(var i = 0, len = users.length; i < len; i++){
               console.log(users[i].userID);
@@ -178,7 +178,7 @@ function runNotificationOnNextLesson() {
           },
           "notificationNextLesson": true
         };
-        Database.find("Users", filter, function(err, users) {
+        Database.find("test", filter, function(err, users) {
           console.log(users);
           for(var i = 0, len = users.length; i < len; i++){
             Schedule.Group(users[i].group).getSchedule(now.getDay(), Schedule.WEEK_PARITY.BOTH, function (schedule) {
