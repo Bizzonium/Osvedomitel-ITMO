@@ -11,6 +11,11 @@ var Group = require('./group.js');
 var Teacher = require('./teacher.js');
 
 /**
+ * Модуль для получение информации о текущей неделе
+ * @type {Week}
+ */
+var Week = require('./week.js');
+/**
  * Содержит константы чётности недели и дней недели
  * @type {object}
  */
@@ -74,6 +79,10 @@ Schedule.prototype.Group = function (groupName) {
  */
 Schedule.prototype.Teacher = function (teacherId) {
   return new Teacher(teacherId);
+};
+
+Schedule.prototype.Week = function () {
+  return new Week();
 };
 
 module.exports = Schedule;

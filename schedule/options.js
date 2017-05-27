@@ -29,9 +29,9 @@ Object.defineProperty(WEEK_DAY, "TOMORROW", {
     date.setDate(date.getDate() + 1);
     var weekDay = [7, 1, 2, 3, 4, 5, 6];
     var tomorrow = date.getDay();
-    if(tomorrow == 0){
-      tomorrow = 1;
-    }
+    // if(tomorrow == 0){
+    //   tomorrow = 1;
+    // }
     return weekDay[tomorrow];
   }
 });
