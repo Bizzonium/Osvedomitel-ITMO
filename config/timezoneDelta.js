@@ -5,4 +5,4 @@
 /** Содержит токен телеграм-бота
  * @type {string}
  */
-module.exports = 2;
+module.exports = 3;
