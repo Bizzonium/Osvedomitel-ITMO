@@ -2,7 +2,7 @@
  * Модуль для работы с telegram-ботами
  * @type {TelegramBot}
  */
-global.TelegramBot = require('node-telegram-bot-api');
+global.TelegramBot = require("tgfancy");
 
 /**
  * Содержит токен телеграм-бота

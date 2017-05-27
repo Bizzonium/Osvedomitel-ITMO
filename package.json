@@ -33,7 +33,7 @@
   "homepage": "https://github.com/Bizzonium/Osvedomitel-ITMO#readme",
   "dependencies": {
     "mongodb": "^2.2.22",
-    "node-telegram-bot-api": "^0.26.0",
-    "request": "^2.79.0"
+    "request": "^2.79.0",
+    "tgfancy": "^0.10.0"
   }
 }
