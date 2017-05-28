@@ -98,9 +98,6 @@ bot.onText(/\/menu/, function(msg){
 bot.onText(/\/admin/, function(msg){
   Menu.adminPanel(msg);
 });
-bot.onText(/\/broadcast/, function(msg){
-  Menu.broadcast(msg);
-});
 /**
  * Callback Query Handler
  */

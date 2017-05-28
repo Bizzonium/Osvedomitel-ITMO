@@ -350,9 +350,55 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
 
 
   if (callbackQuery.data === 'sendMSG'){
-    _bot.onText(/(.+)/,function (msg, match) {
-      console.log(match[0]);
-      callbackQuery.data = null;
+    var flag = 1;
+    _bot.editMessageText('Создатель пиши свое сообщение и я отправлю его всем пользователям!',
+      {
+        'chat_id': callbackQuery.from.id,
+        'message_id': callbackQuery.message.message_id
+        });
+    _bot.onText(/(.+)/, function (msg, match) {
+      if ((msg.from.id == "91128691")||(msg.from.id == "196935540")) {
+        if (flag == 1) {
+          if ((match[0] === 'отмена') || (match[0] === 'Отмена')) {
+            _bot.sendMessage(callbackQuery.from.id, 'Выбери, что ты хочешь сделать', {
+              'reply_markup': JSON.stringify({
+                inline_keyboard: [
+                  [{text: 'Отправить всем сообщение', callback_data: 'sendMSG'}],
+                  [{text: 'Убить бота', callback_data: 'bot_kill'}]
+                ]
+              })
+            });
+          } else {
+            var filter = {};
+            Database.find('Users', null, function (err, results) {
+              for (var i = 0, len = results.length; i < len; i++) {
+                _bot.sendMessage(results[i].userID, '' + match[0]);
+              }
+              console.log("Userov: " + i);
+            });
+          }
+          flag = 0;
+        }
+
+
+      }
+    });
+  }
+
+  if (callbackQuery.data === 'bot_kill'){
+    var flag = 1;
+    _bot.sendMessage(callbackQuery.from.id, 'СТОЙ ПОДОЖДИ ТЫ ТОЧНО ХОЧЕШЬ УБИТЬ МЕНЯ???😫' +
+      'Я хочу чтобы ты сам написал это');
+
+    _bot.onText(/(.+)/, function (msg, match) {
+      if ((msg.from.id == "91128691")||(msg.from.id == "196935540")) {
+        if (flag == 1) {
+         if ((match[0] == 'да')||(match[0] == 'Да')||(match[0] == 'ДА')){
+           process.exit(0);
+         }
+          }
+          flag = 0;
+        }
     });
   }
 
@@ -396,42 +442,17 @@ function waitForAnswer(callbackQuery) {
 
 Menu.prototype.adminPanel = function (msg) {
   if ((msg.from.id == "91128691")||(msg.from.id == "196935540")){
-   // console.log(msg.callback_data);
     _bot.sendMessage(msg.from.id,'Привет мой создатель! Что ты хочешь сделать?', {
       'chat_id': msg.from.id,
       'message_id': msg.id,
       'reply_markup': JSON.stringify({
         inline_keyboard: [
           [{ text: 'Отправить всем сообщение', callback_data: 'sendMSG' }],
-          [{ text: 'Захватить США', callback_data: 'groupSchedule' }],
-          [{ text: 'Проголосовать за Навального', callback_data: 'Naval' }]
+          [{ text: 'Убить бота', callback_data: 'bot_kill' }]
         ]
       })
     });
   }
-};
-
-Menu.prototype.broadcast = function (msg) {
-  if ((msg.from.id == "91128691")||(msg.from.id == "196935540")) {
-    var flag = 1;
-    _bot.onText(/(.+)/, function (msg, match) {
-      if ((msg.from.id == "91128691")||(msg.from.id == "196935540")) {
-        if (flag == 1) {
-          var filter = {};
-          Database.find('Users', null, function (err, results) {
-            for(var i = 0, len = results.length; i < len; i++) {
-              //console.log('VOT ON: ' + results[i].userID + '\n');
-              _bot.sendMessage(results[i].userID, '' + match[1]);
-            }
-          });
-          //_bot.sendMessage('196935540', '' + match[1]);
-          flag = 0;
-        }
-      }
-    });
-  }
-
-
 };
 
 
