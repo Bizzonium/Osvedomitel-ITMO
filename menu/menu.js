@@ -353,7 +353,7 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
         'chat_id': callbackQuery.from.id,
         'message_id': callbackQuery.message.message_id
         });
-    _bot.onText(/(.+)/, function (msg, match) {
+    _bot.onText(/([\S\s]+)/, function (msg, match) {
       if ((msg.from.id == "91128691")||(msg.from.id == "196935540")) {
         if (flag == 1) {
           if ((match[0] === 'отмена') || (match[0] === 'Отмена')) {
@@ -367,9 +367,12 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
             });
           } else {
             var filter = {};
+            var options = {
+              parse_mode: "HTML"
+            };
             Database.find('Users', null, function (err, results) {
               for (var i = 0, len = results.length; i < len; i++) {
-                _bot.sendMessage(results[i].userID, '' + match[0]);
+                _bot.sendMessage(results[i].userID, '' + match[0], options);
               }
               console.log("Userov: " + i);
             });
@@ -390,12 +393,12 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
     _bot.onText(/(.+)/, function (msg, match) {
       if ((msg.from.id == "91128691")||(msg.from.id == "196935540")) {
         if (flag == 1) {
-         if ((match[0] == 'да')||(match[0] == 'Да')||(match[0] == 'ДА')){
-           process.exit(0);
-         }
+          if ((match[0] == 'да')||(match[0] == 'Да')||(match[0] == 'ДА')){
+            process.exit(0);
           }
-          flag = 0;
         }
+        flag = 0;
+      }
     });
   }
 
