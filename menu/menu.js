@@ -418,7 +418,7 @@ Menu.prototype.broadcast = function (msg) {
       if ((msg.from.id == "91128691")||(msg.from.id == "196935540")) {
         if (flag == 1) {
           var filter = {};
-          Database.find('test', null, function (err, results) {
+          Database.find('Users', null, function (err, results) {
             for(var i = 0, len = results.length; i < len; i++) {
               //console.log('VOT ON: ' + results[i].userID + '\n');
               _bot.sendMessage(results[i].userID, '' + match[1]);

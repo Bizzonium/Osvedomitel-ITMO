@@ -36,6 +36,15 @@ Object.defineProperty(WEEK_DAY, "TOMORROW", {
   }
 });
 
+Object.defineProperty(WEEK_DAY, "TODAY", {
+  get: function() {
+    var date = new Date();
+    var weekDay = [7, 1, 2, 3, 4, 5, 6];
+    var today = date.getDay();
+    return weekDay[today];
+  }
+});
+
 module.exports.WEEK_DAY = WEEK_DAY;
 
 module.exports.WEEK_DAY_STRING_LONG = {
