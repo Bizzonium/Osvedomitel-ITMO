@@ -179,7 +179,7 @@ function format(collection, time) {
   var date = new Date();
   var message;
   if(time != false){
-    message = 'Слудующая пара:\n';
+    message = 'Следующая пара:\n';
   }else{
     //date.setDate( date.getDate() + 1);
     var dateString = options.WEEK_DAY_STRING_LONG[date.getDay()].toLowerCase() + ', ' + date.getDate() + ' ' +
