@@ -15,7 +15,7 @@
 
 ## Установка
 ```bash
-# Слонируйте последнюю версию с GitHub и настройте git flow
+# Склонируйте последнюю версию с GitHub и настройте git flow
 git clone https://github.com/Bizzonium/Osvedomitel-ITMO.git
 cd Osvedomitel-ITMO
 git flow init
