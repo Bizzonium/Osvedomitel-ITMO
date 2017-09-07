@@ -110,6 +110,20 @@ Menu.prototype.callbackQueryHandler = function(callbackQuery) {
   /**
    * Условия главного меню и переходы в подменю
    */
+  if (callbackQuery.data == 'tomorrowSchedule'){
+    _Schedule = this.Schedule;
+    
+    _Schedule.Week().get(function(parity){
+    
+      User.getOptions(callbackQuery.from.id,function (userOption) {
+      WEEK = callbackQuery.data;
+       
+      _Schedule.Group(userOption.group).getSchedule(_Schedule.WEEK_DAY.TOMORROW, parity, function (schedule) {
+          sendSchedule(schedule, callbackQuery.from.id);
+        }, true);
+    });});
+    
+  }
   if (callbackQuery.data == 'settings') {
     _bot.editMessageText('Настройки профиля', {
       'chat_id': callbackQuery.from.id,

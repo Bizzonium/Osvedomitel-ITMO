@@ -5,8 +5,9 @@
 module.exports.keyboardHelloMenu = {
   reply_markup: JSON.stringify({
     inline_keyboard: [
-      [{ text: '⚙Настроить профиль', callback_data: 'settings' }],
-      [{ text: '📅👥Расписание моей группы', callback_data: 'groupSchedule' }]
+      [{ text: '📚Расписание на завтра', callback_data: 'tomorrowSchedule'}],
+      [{ text: '📅Расписание моей группы', callback_data: 'groupSchedule' }],
+      [{ text: '⚙Настроить профиль', callback_data: 'settings' }]
     ]
   })
 };
@@ -21,7 +22,8 @@ module.exports.keyboardDayOfWeek = {
       [{ text: 'Понедельник', callback_data: '1' },{text: 'Вторник', callback_data: '2'}],
       [{ text: 'Среда', callback_data: '3' },{text: 'Четверг', callback_data: '4'}],
       [{ text: 'Пятница', callback_data: '5' },{text: 'Суббота', callback_data: '6'}],
-      [{text: 'На всю неделю', callback_data: 'allDay_0'}]
+      [{text: 'На всю неделю', callback_data: 'allDay_0'}],
+      [{ text: '⬅️Вернуться в главное меню', callback_data: 'settingsBack' }]
     ]
   })
 };
